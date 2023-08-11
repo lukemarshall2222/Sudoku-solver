@@ -90,10 +90,6 @@ def create_units() -> list[list]:
     return all_units
 
 
-
-
-
-
 def valid_puzzle(units: list[list], values: dict) -> bool:
     for i in range(27):
         possible_values = {1, 2, 3, 4, 5, 6, 7, 8, 9}
@@ -123,3 +119,9 @@ def main():
                         [020000060],[000080400],[000010000],
                         [000603070],[500200000],[104000000]]""")
     values = translate_puzzle(puzzle)
+    all_units = create_units(puzzle)
+    if not valid_puzzle(all_units, values):
+        return False
+    else:
+        pass
+    
