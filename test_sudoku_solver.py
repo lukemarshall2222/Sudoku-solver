@@ -15,6 +15,9 @@ class test_solver(unittest.TestCase):
         self.puzzle = [[4, 0, 0, 0, 0, 0, 8, 0, 5], [0, 3, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 7, 0, 0, 0, 0, 0],
                        [0, 2, 0, 0, 0, 0, 0, 6, 0], [0, 0, 0, 0, 8, 0, 4, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0],
                        [0, 0, 0, 6, 0, 3, 0, 7, 0], [5, 0, 0, 2, 0, 0, 0, 0, 0], [1, 0, 4, 0, 0, 0, 0, 0, 0]]
+        self.null_puzzle = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]]
         translated = sudoku_solver.translate_puzzle(self.puzzle)
 
 
@@ -38,11 +41,7 @@ class test_solver(unittest.TestCase):
     
     def test_create_units(self):
 
-        null_puzzle = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]]
-        translated = sudoku_solver.translate_puzzle(null_puzzle)
-        
+        translated = sudoku_solver.translate_puzzle(self.null_puzzle)
         units = sudoku_solver.create_units()
         for unit in units:
             for square in unit:
@@ -53,6 +52,20 @@ class test_solver(unittest.TestCase):
         
         for key in translated:
             self.assertEqual(translated[key], 3)
+
+    def test_valid_puzzle(self):
+        units = sudoku_solver.create_units()
+        self.assertTrue(sudoku_solver.valid_puzzle(units, sudoku_solver.translate_puzzle(self.puzzle)))
+        self.assertTrue(sudoku_solver.valid_puzzle(units, sudoku_solver.translate_puzzle(self.null_puzzle)))
+        
+        invalid_puzzle_row = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0], [6, 0, 0, 0, 0, 0, 0, 0, 6], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        invalid_puzzle_col = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 3, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 3, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        self.assertFalse(sudoku_solver.valid_puzzle(units, sudoku_solver.translate_puzzle(invalid_puzzle_row)))
+        self.assertFalse(sudoku_solver.valid_puzzle(units, sudoku_solver.translate_puzzle(invalid_puzzle_col)))
 
 
 if __name__ == '__main__':

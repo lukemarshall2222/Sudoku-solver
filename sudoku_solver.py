@@ -5,6 +5,14 @@ Description: Sudoku solver in Python using constraint propogation and search.
 
 
 def translate_puzzle(puzzle: list[list]) -> dict:
+    # check puzzle has necessary rows and columns
+    assert len(puzzle) == 9, "Puzzles must contain 9 rows of values."
+    for row in puzzle:
+        assert len(row) == 9, """Puzzle rows should contain 9 values, a number
+                                 1-9 if given or 0 if empty."""
+    
+    # translate the puzzle into a dict with coordinates as keys and a number 1-9 or
+    # a string of possible numbers as values
     rows = 'ABCDEFGHI'
     all_possible_values = '123456789'
     values = {}
@@ -19,10 +27,11 @@ def translate_puzzle(puzzle: list[list]) -> dict:
 
 
 def create_3x3s_from_3x9(grid_3x9: list[list], start: int) -> list[list]:
-    # Creates 3x3 matrices out of the 3x9 matrix, takes a starting integer in order to 
-    # differentiate the outputs from the 3 3x9 matrices made from the original puzzle board
+    # Creates 3x3 matrices out of the 3x9 matrix. Takes a starting integer in
+    # order to differentiate the outputs from the 3 3x9 matrices made from the
+    # original puzzle board
     rows = 'ABCDEFGHI'
-    grid_3x3s = [[],[],[]]
+    grid_3x3s = [[], [], []]
     for i in range(start, start+3):
         for j in range(9):
             if j < 3:
@@ -56,17 +65,17 @@ def create_units() -> list[list]:
     for i in range(9):
         boxes.append([])
 
-    grid_3x9_1 = [[],[],[]]
+    grid_3x9_1 = [[], [], []]
     for j in range(3):
         for k in range(9):
             grid_3x9_1[j].append(('').join([row_order[j], str(k+1)]))
 
-    grid_3x9_2 = [[],[],[]]
+    grid_3x9_2 = [[], [], []]
     for j in range(3):
         for k in range(9):
             grid_3x9_2[j].append(('').join([row_order[j+3], str(k+1)]))
 
-    grid_3x9_3 = [[],[],[]]
+    grid_3x9_3 = [[], [], []]
     for j in range(3):
         for k in range(9):
             grid_3x9_2[j].append(('').join([row_order[j+6], str(k+1)]))
@@ -91,10 +100,11 @@ def create_units() -> list[list]:
 
 
 def valid_puzzle(units: list[list], values: dict) -> bool:
+
     for i in range(27):
         possible_values = {1, 2, 3, 4, 5, 6, 7, 8, 9}
         for j in range(9):
-            if values[units[i][j]].isnumeric():
+            if isinstance(values[units[i][j]], int):
                 if values[units[i][j]] in possible_values:
                     possible_values.remove(values[units[i][j]])
                 else:
@@ -105,6 +115,7 @@ def valid_puzzle(units: list[list], values: dict) -> bool:
 
 
 #def constraint_propogation(values: dict) -> dict:
+
 
 
 #def search(values: dict) -> dict:
