@@ -26,11 +26,11 @@ def create_3x3s_from_3x9(grid_3x9: list[list], start: int) -> list[list]:
     for i in range(start, start+3):
         for j in range(9):
             if j < 3:
-                grid_3x3s[0].append(('').join([rows[i], str[j+1]]))
+                grid_3x3s[0].append(('').join([rows[i], str(j+1)]))
             elif 3 <= j < 6:
-                grid_3x3s[1].append(('').join([rows[i], str[j+1]]))
+                grid_3x3s[1].append(('').join([rows[i], str(j+1)]))
             else:
-                grid_3x3s[2].append(('').join([rows[i], str[j+1]]))
+                grid_3x3s[2].append(('').join([rows[i], str(j+1)]))
     return grid_3x3s
 
 
@@ -104,10 +104,10 @@ def valid_puzzle(units: list[list], values: dict) -> bool:
     return True
 
 
-def constraint_propogation(values: dict) -> dict:
+#def constraint_propogation(values: dict) -> dict:
 
 
-def search(values: dict) -> dict:
+#def search(values: dict) -> dict:
     
 
 def main():
@@ -115,9 +115,9 @@ def main():
                    The puzzle must be in the form of a list of 9 rows.
                    The given values must be placed in their original spots
                    with empty squares are represented by zeros.
-                   Ex: [[400000805],[030000000],[000700000],
-                        [020000060],[000080400],[000010000],
-                        [000603070],[500200000],[104000000]]""")
+                   Ex: [[4,0,0,0,0,0,8,0,5],[0,3,0,0,0,0,0,0,0],[0,0,0,7,0,0,0,0,0],
+                        [0,2,0,0,0,0,0,6,0],[0,0,0,0,8,0,4,0,0],[0,0,0,0,1,0,0,0,0],
+                        [0,0,0,6,0,3,0,7,0],[5,0,0,2,0,0,0,0,0],[1,0,4,0,0,0,0,0,0]]""")
     values = translate_puzzle(puzzle)
     all_units = create_units(puzzle)
     if not valid_puzzle(all_units, values):
