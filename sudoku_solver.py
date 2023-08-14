@@ -179,16 +179,16 @@ def search(values: dict, units: list[list]) -> dict:
     
     # use the square with the least number of options as a launch
     # point to guess its value and execute more constraint propogation
+    values_copy = values.copy()
     for char in values_copy[least_key]:
         values_copy[least_key] = char
-
-        while 
-        resultant_dict = constraint_propogation(values, units)
-        if valid_puzzle(units, values):
-            if solved_puzzle(units, values):
-                return resultant_dict
+        while True:
+            resultant_dict = constraint_propogation(values_copy, units)
+            if resultant_dict == values_copy:
+                break
             else:
-                search(resultant_dict)
+                values_copy = resultant_dict
+
 
     
     
