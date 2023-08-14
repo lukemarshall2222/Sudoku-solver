@@ -171,6 +171,7 @@ def search(values: dict, units: list[list]) -> dict:
     # recursive case: 
 
     # find the square with the least number of value options 
+    values_copy = values.copy()
     least_key = ''
     values_len = 9
     for key in values:
@@ -178,18 +179,19 @@ def search(values: dict, units: list[list]) -> dict:
             if len(values[key]) < values_len:
                 least_key = key
                 values_len = len(values[key])
+    values_copy[least_key] = int(values_copy[least_key][0])
+    while True:
+        resultant_dict = constraint_propogation(values_copy, units)
+        if values_copy == resultant_dict:
+            break
+        else:
+            values_copy = resultant_dict
+
+    
     
     # use the square with the least number of options as a launch
     # point to guess its value and execute more constraint propogation
-    values_copy = values.copy()
-    for char in values_copy[least_key]:
-        values_copy[least_key] = char
-        while True:
-            resultant_dict = constraint_propogation(values_copy, units)
-            if resultant_dict == values_copy:
-                break
-            else:
-                values_copy = resultant_dict
+    if not valid_puzzle(units, values_copy)
 
 
     
