@@ -141,20 +141,26 @@ def constraint_propogation(values: dict, units: list[list]) -> dict:
                 continue
 
     for unit in units:
-        possible_values = '123456789'
+        possible_values = {}
+        for i in range(10):
+            possible_values[str(i)] = 0
+
         for square in unit:
             if isinstance(values[square], int):
-                possible_values.replace(str(values[square]), '')
+                continue
             else:
                 for char in values[square]:
-                    possible_values.replace(char, '')
-        if len(possible_values) == 1:
-            for sq in unit:
-                if isinstance(values[sq], str):
-                    for char in values[sq]:
-                        if char == possible_values:
-                            values[sq] = int(char)
-                            break
+                    possible_values[char] += 1
+        replacement = ''
+        for key in possible_values:
+            if possible_values[key] == 1:
+                replacement = possible_values[key]
+        for sq in unit:
+            if isinstance(values[sq], str):
+                for char in values[sq]:
+                    if char == replacement:
+                        values[sq] = int(char)
+                        break
         else:
             continue
 
@@ -189,14 +195,12 @@ def search(values: dict, units: list[list]) -> dict:
         return search(values_copy, units)
     else:
         values[least_key].replace(values[least_key][0], '')
-        search(values, units)
+        return search(values, units)
 
     
     
     # use the square with the least number of options as a launch
-    # point to guess its value and execute more constraint propogation
-    if not valid_puzzle(units, values_copy)
-
+    # point to guess its value and execute more constraint propogation.
 
     
     
