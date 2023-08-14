@@ -162,8 +162,13 @@ def constraint_propogation(values: dict, units: list[list]) -> dict:
 
 def search(values: dict, units: list[list]) -> dict:
 
+    # base case: 
+    if solved_puzzle(units, values):
+        return values
+
+    # recursive case: 
+
     # find the square with the least number of value options 
-    values_copy = values.copy()
     least_key = ''
     values_len = 9
     for key in values:
