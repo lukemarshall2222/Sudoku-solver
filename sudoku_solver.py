@@ -165,6 +165,8 @@ def search(values: dict, units: list[list]) -> dict:
     # base case: 
     if solved_puzzle(units, values):
         return values
+    
+    if valid_puzzle()
 
     # recursive case: 
 
