@@ -165,8 +165,6 @@ def search(values: dict, units: list[list]) -> dict:
     # base case: 
     if solved_puzzle(units, values):
         return values
-    
-    if valid_puzzle()
 
     # recursive case: 
 
@@ -186,6 +184,12 @@ def search(values: dict, units: list[list]) -> dict:
             break
         else:
             values_copy = resultant_dict
+
+    if valid_puzzle(units, values_copy):
+        return search(values_copy, units)
+    else:
+        values[least_key].replace(values[least_key][0], '')
+        search(values, units)
 
     
     
