@@ -151,19 +151,18 @@ def constraint_propogation(values: dict, units: list[list]) -> dict:
             else:
                 for char in values[square]:
                     possible_values[char] += 1
-        replacement = ''
+        replacement = 0
         for key in possible_values:
             if possible_values[key] == 1:
-                replacement = possible_values[key]
-        for sq in unit:
-            if isinstance(values[sq], str):
-                for char in values[sq]:
-                    if char == replacement:
-                        values[sq] = int(char)
-                        break
-        else:
-            continue
-
+                replacement = int(key)
+                for sq in unit:
+                    if isinstance(values[sq], str):
+                        for char in values[sq]:
+                            if char == replacement:
+                                values[sq] = int(char)
+                                break
+            else:
+                continue
 
 
 def search(values: dict, units: list[list]) -> dict:
@@ -183,6 +182,9 @@ def search(values: dict, units: list[list]) -> dict:
             if len(values[key]) < values_len:
                 least_key = key
                 values_len = len(values[key])
+
+    # use the square with the least number of options as a launch
+    # point to guess its value and execute more constraint propogation.
     values_copy[least_key] = int(values_copy[least_key][0])
     while True:
         resultant_dict = constraint_propogation(values_copy, units)
@@ -196,13 +198,6 @@ def search(values: dict, units: list[list]) -> dict:
     else:
         values[least_key].replace(values[least_key][0], '')
         return search(values, units)
-
-    
-    
-    # use the square with the least number of options as a launch
-    # point to guess its value and execute more constraint propogation.
-
-    
     
 
 def main():
@@ -214,9 +209,9 @@ def main():
                         [0,2,0,0,0,0,0,6,0],[0,0,0,0,8,0,4,0,0],[0,0,0,0,1,0,0,0,0],
                         [0,0,0,6,0,3,0,7,0],[5,0,0,2,0,0,0,0,0],[1,0,4,0,0,0,0,0,0]]""")
     values = translate_puzzle(puzzle)
-    all_units = create_units(puzzle)
-    if not valid_puzzle(all_units, values):
-        return False
-    else:
-        pass
+    units = create_units(puzzle)
+
+    assert valid_puzzle(units, values), "This puzzle is not valid"
+
+    return search(values, units)
     
