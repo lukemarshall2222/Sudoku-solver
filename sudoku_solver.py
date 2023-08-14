@@ -115,6 +115,7 @@ def valid_puzzle(units: list[list], values: dict) -> bool:
 
 
 def solved_puzzle(units: list[list], values: dict) -> bool:
+
     if valid_puzzle(units, values):
         for key in values:
             if isinstance(values[key], int):
@@ -127,6 +128,7 @@ def solved_puzzle(units: list[list], values: dict) -> bool:
 
 
 def constraint_propogation(values: dict, units: list[list]) -> dict:
+
     for unit in units:
         for square in unit:
             if isinstance(values[square], int):
@@ -137,27 +139,53 @@ def constraint_propogation(values: dict, units: list[list]) -> dict:
                         continue
             else:
                 continue
+
     for unit in units:
         possible_values = '123456789'
         for square in unit:
             if isinstance(values[square], int):
-                possible_values.replace(values[square], '')
+                possible_values.replace(str(values[square]), '')
             else:
-                for letter in values[square]:
-                    possible_values.replace(letter, '')
+                for char in values[square]:
+                    possible_values.replace(char, '')
         if len(possible_values) == 1:
             for sq in unit:
                 if isinstance(values[sq], str):
-                    for letter in values[sq]:
-                        if letter == possible_values:
-                            values[sq] = int(letter)
+                    for char in values[sq]:
+                        if char == possible_values:
+                            values[sq] = int(char)
                             break
         else:
             continue
 
 
 
-#def search(values: dict) -> dict:
+def search(values: dict, units: list[list]) -> dict:
+
+    # find the square with the least number of value options 
+    values_copy = values.copy()
+    least_key = ''
+    values_len = 9
+    for key in values:
+        if isinstance(values[key], str):
+            if len(values[key]) < values_len:
+                least_key = key
+                values_len = len(values[key])
+    
+    # use the square with the least number of options as a launch
+    # point to guess its value and execute more constraint propogation
+    for char in values_copy[least_key]:
+        values_copy[least_key] = char
+
+        while 
+        resultant_dict = constraint_propogation(values, units)
+        if valid_puzzle(units, values):
+            if solved_puzzle(units, values):
+                return resultant_dict
+            else:
+                search(resultant_dict)
+
+    
     
 
 def main():
