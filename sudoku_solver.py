@@ -114,7 +114,46 @@ def valid_puzzle(units: list[list], values: dict) -> bool:
     return True
 
 
-#def constraint_propogation(values: dict) -> dict:
+def solved_puzzle(units: list[list], values: dict) -> bool:
+    if valid_puzzle(units, values):
+        for key in values:
+            if isinstance(values[key], int):
+                continue
+            else:
+                return False
+        return True
+    else:
+        return False
+
+
+def constraint_propogation(values: dict, units: list[list]) -> dict:
+    for unit in units:
+        for square in unit:
+            if isinstance(values[square], int):
+                for sq in unit:
+                    if isinstance(values[sq], str):
+                        values[sq].replace(values[square], '')
+                    else:
+                        continue
+            else:
+                continue
+    for unit in units:
+        possible_values = '123456789'
+        for square in unit:
+            if isinstance(values[square], int):
+                possible_values.replace(values[square], '')
+            else:
+                for letter in values[square]:
+                    possible_values.replace(letter, '')
+        if len(possible_values) == 1:
+            for sq in unit:
+                if isinstance(values[sq], str):
+                    for letter in values[sq]:
+                        if letter == possible_values:
+                            values[sq] = int(letter)
+                            break
+        else:
+            continue
 
 
 
