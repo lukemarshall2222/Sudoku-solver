@@ -100,6 +100,14 @@ def create_units() -> list[list]:
 
 
 def valid_puzzle(units: list[list], values: dict) -> bool:
+    count = 0
+    possibilities = {1, 2, 3, 4, 5, 6, 7, 8, 9}
+    for key in values:
+        if isinstance(values[key], int):
+            count += 1
+            possibilities.discard(values[key])
+    if (count < 17) and (len(possibilities) > 1):
+        return False
 
     for i in range(27):
         possible_values = {1, 2, 3, 4, 5, 6, 7, 8, 9}
@@ -128,13 +136,12 @@ def solved_puzzle(units: list[list], values: dict) -> bool:
 
 
 def constraint_propogation(values: dict, units: list[list]) -> dict:
-
     for unit in units:
         for square in unit:
             if isinstance(values[square], int):
                 for sq in unit:
                     if isinstance(values[sq], str):
-                        values[sq].replace(values[square], '')
+                        values[sq] = values[sq].replace(str(values[square]), '')
                     else:
                         continue
             else:
@@ -151,7 +158,6 @@ def constraint_propogation(values: dict, units: list[list]) -> dict:
             else:
                 for char in values[square]:
                     possible_values[char] += 1
-        replacement = 0
         for key in possible_values:
             if possible_values[key] == 1:
                 replacement = int(key)
@@ -163,6 +169,8 @@ def constraint_propogation(values: dict, units: list[list]) -> dict:
                                 break
             else:
                 continue
+    
+    return values
 
 
 def search(values: dict, units: list[list]) -> dict:
@@ -196,7 +204,7 @@ def search(values: dict, units: list[list]) -> dict:
     if valid_puzzle(units, values_copy):
         return search(values_copy, units)
     else:
-        values[least_key].replace(values[least_key][0], '')
+        values[least_key] = values[least_key].replace(values[least_key][0], '')
         return search(values, units)
     
 
