@@ -4,24 +4,24 @@ Description: Sudoku solver in Python using constraint propogation and search.
 """
 
 
-def translate_puzzle(puzzle: list[list]) -> dict:
+def translate_puzzle(puzzle: str) -> dict:
     # check puzzle has necessary rows and columns
-    assert len(puzzle) == 9, "Puzzles must contain 9 rows of values."
-    for row in puzzle:
-        assert len(row) == 9, """Puzzle rows should contain 9 values, a number
-                                 1-9 if given or 0 if empty."""
+    assert len(puzzle) == 81, "Puzzles must contain 9 rows of values, 81 values in the string."
+    puzzle = puzzle.replace('.', '0')
     
     # translate the puzzle into a dict with coordinates as keys and a number 1-9 or
     # a string of possible numbers as values
     rows = 'ABCDEFGHI'
     all_possible_values = '123456789'
     values = {}
+    position = 0
     for i in range(9):
         for j in range(9):
-            if puzzle[i][j]:
-                values[('').join([rows[i], str(j+1)])] = puzzle[i][j]
+            if int(puzzle[position]):
+                values[('').join([rows[i], str(j+1)])] = puzzle[position]
             else:
                 values[('').join([rows[i], str(j+1)])] = all_possible_values
+            position += 1
     
     return values
 
@@ -101,18 +101,18 @@ def create_units() -> list[list]:
 
 def valid_puzzle(units: list[list], values: dict) -> bool:
     count = 0
-    possibilities = {1, 2, 3, 4, 5, 6, 7, 8, 9}
+    possibilities = {'1', '2', '3', '4', '5', '6', '7', '8', '9'}
     for key in values:
-        if isinstance(values[key], int):
+        if len(values[key]) == 1:
             count += 1
             possibilities.discard(values[key])
     if (count < 17) and (len(possibilities) > 1):
         return False
 
     for i in range(27):
-        possible_values = {1, 2, 3, 4, 5, 6, 7, 8, 9}
+        possible_values = {'1', '2', '3', '4', '5', '6', '7', '8', '9'}
         for j in range(9):
-            if isinstance(values[units[i][j]], int):
+            if len(values[units[i][j]]) == 1:
                 if values[units[i][j]] in possible_values:
                     possible_values.remove(values[units[i][j]])
                 else:
@@ -123,10 +123,9 @@ def valid_puzzle(units: list[list], values: dict) -> bool:
 
 
 def solved_puzzle(units: list[list], values: dict) -> bool:
-
     if valid_puzzle(units, values):
         for key in values:
-            if isinstance(values[key], int):
+            if len(values[key]) == 1:
                 continue
             else:
                 return False
@@ -136,38 +135,45 @@ def solved_puzzle(units: list[list], values: dict) -> bool:
 
 
 def constraint_propogation(values: dict, units: list[list]) -> dict:
+    # If a square has only one possible value,
+    # then eliminate that value from the square's peers
     for unit in units:
         for square in unit:
-            if isinstance(values[square], int):
+            if len(values[square]) == 1:
                 for sq in unit:
-                    if isinstance(values[sq], str):
-                        values[sq] = values[sq].replace(str(values[square]), '')
+                    if len(values[sq]) > 1:
+                        values[sq] = values[sq].replace(values[square], '')
                     else:
                         continue
             else:
                 continue
 
+    # If a unit has only one possibe place for a value, 
+    # then put that value there
     possible_values = {}
     for unit in units:
-        for i in range(10):
+        for i in range(9):
             possible_values[str(i+1)] = 0
 
     for unit in units:
         for square in unit:
-            if isinstance(values[square], str):
+            if len(values[square]) > 1:
                 for char in values[square]:
                     possible_values[char] += 1
             else:
                 continue
         for key in possible_values:
             if possible_values[key] == 1:
-                replacement = int(key)
                 for sq in unit:
-                    if isinstance(values[sq], str):
-                        for char in values[sq]:
-                            if char == str(replacement):
-                                values[sq] = replacement
+                    if len(values[sq]) > 1:
+                        for character in values[sq]:
+                            if character == key:
+                                values[sq] = key
                                 break
+                            else:
+                                continue
+                    else:
+                        continue
             else:
                 continue
     
@@ -180,27 +186,27 @@ def search(values: dict, units: list[list]) -> dict:
     if solved_puzzle(units, values):
         return values
 
-    # recursive case: 
+    # recursive case:
 
-    # find the square with the least number of value options 
+    # find the square with the least number of value options
     values_copy = values.copy()
     least_key = ''
     values_len = 9
     for key in values:
-        if isinstance(values[key], str):
-            if len(values[key]) < values_len:
-                least_key = key
-                values_len = len(values[key])
+        if 1 < len(values[key]) < values_len:
+            least_key = key
+            values_len = len(values[key])
 
     # use the square with the least number of options as a launch
     # point to guess its value and execute more constraint propogation.
-    values_copy[least_key] = int(values_copy[least_key][0])
+    values_copy[least_key] = values_copy[least_key][0]
+    check_dict = values_copy.copy()
     while True:
-        resultant_dict = constraint_propogation(values_copy, units)
-        if values_copy == resultant_dict:
+        constraint_propogation(values_copy, units)
+        if values_copy == check_dict:
             break
         else:
-            values_copy = resultant_dict
+            values_copy = check_dict.copy()
 
     if valid_puzzle(units, values_copy):
         return search(values_copy, units)
@@ -211,12 +217,11 @@ def search(values: dict, units: list[list]) -> dict:
 
 def main():
     puzzle = input("""Please enter a Sudoku puzzle.
-                   The puzzle must be in the form of a list of 9 rows.
+                   The puzzle must be in the form of a string of 81 values.
                    The given values must be placed in their original spots
-                   with empty squares are represented by zeros.
-                   Ex: [[4,0,0,0,0,0,8,0,5],[0,3,0,0,0,0,0,0,0],[0,0,0,7,0,0,0,0,0],
-                        [0,2,0,0,0,0,0,6,0],[0,0,0,0,8,0,4,0,0],[0,0,0,0,1,0,0,0,0],
-                        [0,0,0,6,0,3,0,7,0],[5,0,0,2,0,0,0,0,0],[1,0,4,0,0,0,0,0,0]]""")
+                   with empty squares represented by zero ('0') or ('.').
+                   Ex: '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'"""
+)
     values = translate_puzzle(puzzle)
     units = create_units(puzzle)
 

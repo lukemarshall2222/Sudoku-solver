@@ -12,31 +12,40 @@ class test_solver(unittest.TestCase):
     def setUp(self):
         self.rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
         self.columns = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
-        self.puzzle = [[4, 0, 0, 0, 0, 0, 8, 0, 5], [0, 3, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 7, 0, 0, 0, 0, 0],
-                       [0, 2, 0, 0, 0, 0, 0, 6, 0], [0, 0, 0, 0, 8, 0, 4, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0],
-                       [0, 0, 0, 6, 0, 3, 0, 7, 0], [5, 0, 0, 2, 0, 0, 0, 0, 0], [1, 0, 4, 0, 0, 0, 0, 0, 0]]
-        self.null_puzzle = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]]
-        self.solved_puzzle = [[4, 8, 3, 9, 2, 1, 6, 5, 7], [9, 6, 7, 3, 4, 5, 8, 2, 1], [2, 5, 1, 8, 7, 6, 4, 9, 3],
-                              [5, 4, 8, 1, 3, 2, 9, 7, 6], [7, 2, 9, 5, 6, 4, 1, 3, 8], [1, 3, 6, 7, 9, 8, 2, 4, 5],
-                              [3, 7, 2, 6, 8, 9, 5, 1, 4], [8, 1, 4, 2, 5, 3, 7, 6, 9], [6, 9, 5, 4, 1, 7, 3, 8, 2]]
+        self.puzzle = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+        self.puzzle_w_zeros = "400000805030000000000700000020000060000080400000010000000603070500200000104000000"
+        self.null_puzzle = "000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        self.solved_puzzle = "483921657967345821251876493548132976729564138136798245372689514814253769695417382"
         
         self.units = sudoku_solver.create_units()
 
     def test_translate_puzzle(self):
+        translated = sudoku_solver.translate_puzzle(self.puzzle)
+
+        # check if all the coordinates are in the dict
         for row in self.rows:
             for col in self.columns:
-                self.assertIn(
-                    ('').join([row, col]), sudoku_solver.translate_puzzle(self.puzzle))
+                self.assertIn(('').join([row, col]), translated)
 
-        translated = sudoku_solver.translate_puzzle(self.puzzle)
-        self.assertEqual(translated['A1'], 4)
-        self.assertEqual(translated['A7'], 8)
-        self.assertEqual(translated['A9'], 5)
-        self.assertEqual(translated['E5'], 8)
-        self.assertEqual(translated['I1'], 1)
-        self.assertEqual(translated['I3'], 4)
+        # check if the values for squares match the original
+        # original has dots for empty squares
+        self.assertEqual(translated['A1'], '4')
+        self.assertEqual(translated['A7'], '8')
+        self.assertEqual(translated['A9'], '5')
+        self.assertEqual(translated['E5'], '8')
+        self.assertEqual(translated['I1'], '1')
+        self.assertEqual(translated['I3'], '4')
+        self.assertEqual(translated['A2'], '123456789')
+        self.assertEqual(translated['I9'], '123456789')
+
+        # original has zeros for empty squares
+        translated = sudoku_solver.translate_puzzle(self.puzzle_w_zeros)
+        self.assertEqual(translated['A1'], '4')
+        self.assertEqual(translated['A7'], '8')
+        self.assertEqual(translated['A9'], '5')
+        self.assertEqual(translated['E5'], '8')
+        self.assertEqual(translated['I1'], '1')
+        self.assertEqual(translated['I3'], '4')
         self.assertEqual(translated['A2'], '123456789')
         self.assertEqual(translated['I9'], '123456789')
 
@@ -56,12 +65,8 @@ class test_solver(unittest.TestCase):
         self.assertTrue(sudoku_solver.valid_puzzle(self.units, sudoku_solver.translate_puzzle(self.puzzle)))
         self.assertFalse(sudoku_solver.valid_puzzle(self.units, sudoku_solver.translate_puzzle(self.null_puzzle)))
         
-        invalid_puzzle_row = [[1, 0, 0, 0, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0, 0, 0, 0], [7, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 2, 0, 0, 0, 0, 0, 0, 0], [6, 0, 0, 0, 0, 0, 0, 0, 6], [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 3, 0, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 8, 0, 9]]
-        invalid_puzzle_col = [[0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 3, 0], [0, 0, 0, 0, 0, 8, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 2, 0, 0, 0], [0, 0, 4, 0, 0, 0, 0, 0, 0], [0, 0, 5, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 7, 0, 0, 0, 0], [0, 6, 0, 0, 0, 0, 0, 3, 0], [0, 0, 0, 0, 9, 0, 0, 0, 0]]
+        invalid_puzzle_row = "100000000400000000700000000020000000600000006000000000003000000500000000000000809"
+        invalid_puzzle_col = "010000000000000030000008000000002000004000000005000000000070000060000030000090000"
         self.assertFalse(sudoku_solver.valid_puzzle(self.units, sudoku_solver.translate_puzzle(invalid_puzzle_row)))
         self.assertFalse(sudoku_solver.valid_puzzle(self.units, sudoku_solver.translate_puzzle(invalid_puzzle_col)))
 
@@ -76,25 +81,25 @@ class test_solver(unittest.TestCase):
         self.assertFalse(sudoku_solver.solved_puzzle(self.units, translated_3))
     
     def test_constraint_propogation(self):
-        solvable_by_cp = [[0, 0, 3, 0, 2, 0, 6, 0, 0], [9, 0, 0, 3, 0, 5, 0, 0, 1], [0, 0, 1, 8, 0, 6, 4, 0, 0],
-                          [0, 0, 8, 1, 0, 2, 9, 0, 0], [7, 0, 0, 0, 0, 0, 0, 0, 8], [0, 0, 6, 7, 0, 8, 2, 0, 0],
-                          [0, 0, 2, 6, 0, 9, 5, 0, 0], [8, 0, 0, 2, 0, 3, 0, 0, 9], [0, 0, 5, 0, 1, 0, 3, 0, 0]]
+        solvable_by_cp = '003020600900305001001806400008102900700000008006708200002609500800203009005010300'
         translated = sudoku_solver.translate_puzzle(solvable_by_cp)
         check_dict = translated.copy()
+        solved = translated.copy()
         count = 0
         while True:
             count += 1
-            print(count)
-            print(check_dict)
-            solved = sudoku_solver.constraint_propogation(check_dict, self.units)
-            print(solved)
+            # print(count)
+            sudoku_solver.constraint_propogation(solved, self.units)
             if solved == check_dict:
+                # print(solved)
+                # print(check_dict)
                 break
             else:
+                # print("broken")
                 check_dict = solved.copy()
                 continue
     
-        self.assertTrue(sudoku_solver.solved_puzzle(self.units, check_dict))
+        self.assertTrue(sudoku_solver.solved_puzzle(self.units, solved))
 
 
 
