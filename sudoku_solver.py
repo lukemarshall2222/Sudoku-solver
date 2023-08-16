@@ -147,25 +147,26 @@ def constraint_propogation(values: dict, units: list[list]) -> dict:
             else:
                 continue
 
+    possible_values = {}
     for unit in units:
-        possible_values = {}
         for i in range(10):
-            possible_values[str(i)] = 0
+            possible_values[str(i+1)] = 0
 
+    for unit in units:
         for square in unit:
-            if isinstance(values[square], int):
-                continue
-            else:
+            if isinstance(values[square], str):
                 for char in values[square]:
                     possible_values[char] += 1
+            else:
+                continue
         for key in possible_values:
             if possible_values[key] == 1:
                 replacement = int(key)
                 for sq in unit:
                     if isinstance(values[sq], str):
                         for char in values[sq]:
-                            if char == replacement:
-                                values[sq] = int(char)
+                            if char == str(replacement):
+                                values[sq] = replacement
                                 break
             else:
                 continue

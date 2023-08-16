@@ -81,14 +81,20 @@ class test_solver(unittest.TestCase):
                           [0, 0, 2, 6, 0, 9, 5, 0, 0], [8, 0, 0, 2, 0, 3, 0, 0, 9], [0, 0, 5, 0, 1, 0, 3, 0, 0]]
         translated = sudoku_solver.translate_puzzle(solvable_by_cp)
         check_dict = translated.copy()
+        count = 0
         while True:
+            count += 1
+            print(count)
+            print(check_dict)
             solved = sudoku_solver.constraint_propogation(check_dict, self.units)
+            print(solved)
             if solved == check_dict:
                 break
             else:
                 check_dict = solved.copy()
-        print(solved)
-        self.assertTrue(sudoku_solver.solved_puzzle(self.units, solved))
+                continue
+    
+        self.assertTrue(sudoku_solver.solved_puzzle(self.units, check_dict))
 
 
 
