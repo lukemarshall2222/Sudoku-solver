@@ -199,9 +199,9 @@ def cp_loop(values: dict, units: list[list]) -> dict:
 
 
 def search(values: dict, units: list[list]) -> bool:
-    propagated = cp_loop(values, units)
-    if solved_puzzle(units, propagated) or not valid_puzzle(units, propagated):
-        return propagated
+    values = cp_loop(values, units)
+    if solved_puzzle(units, values) or not valid_puzzle(units, values):
+        return values
     values_copy = values.copy()
     least_key = ''
     values_len = 10
@@ -211,44 +211,12 @@ def search(values: dict, units: list[list]) -> bool:
             values_len = len(values[key])
     for value in values[least_key]:
         values[least_key] = value
-        solved = search(values, units)
-        if solved_puzzle(units, solved):
-            return solved
+        values = search(values, units)
+        if solved_puzzle(units, values):
+            return values
         else:
             values = values_copy.copy()
     return values
-
-
-    '''#Base Case:
-    if solved_puzzle(units, values):
-        return values
-    # find the order of the sqaures with the least number of value options
-    least_key_order = []
-    values_len = 2
-    for order in range(9):
-        for key in values:
-            if len(values[key]) == order+1:
-                least_key_order.append(key)
-        values_len += 1
-
-    # use the square with the least number of options as a launch
-    # point to guess its value and execute more constraint propogation
-    values_copy = values.copy()  
-    new_values = {}
-    for key in least_key_order:
-        if len(values_copy[key]) == 1:
-            continue
-        for value in values_copy[key]:
-            values_copy[key] = values[key][0]
-            new_values = cp_loop(values_copy, units)
-            if valid_puzzle(units, new_values) and not solved_puzzle(units, new_values):
-                new_values = search(new_values, units)
-            elif not valid_puzzle(units, new_values):
-                new_values = search(values, units)
-            if solved_puzzle(units, new_values):
-                return new_values
-    
-    return values'''
     
 
 def main():

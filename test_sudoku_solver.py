@@ -5,6 +5,7 @@ Description: Test cases for Sudoku_solver.py
 
 import unittest
 import sudoku_solver
+import time
 
 
 class test_solver(unittest.TestCase):
@@ -18,7 +19,6 @@ class test_solver(unittest.TestCase):
         self.solved_puzzle = "483921657967345821251876493548132976729564138136798245372689514814253769695417382"
         self.solvable_by_cp = '003020600900305001001806400008102900700000008006708200002609500800203009005010300'
 
-        
         self.units = sudoku_solver.create_units()
 
     def test_translate_puzzle(self):
@@ -104,10 +104,14 @@ class test_solver(unittest.TestCase):
         self.assertTrue(sudoku_solver.solved_puzzle(self.units, solved))
 
     def test_search(self):
-        hard_puzzle = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+        hard_puzzle = "48.3............71.2.......7.5....6....2..8.............1.76...3.....4......5...."
         translated = sudoku_solver.translate_puzzle(hard_puzzle)
+        start_time = time.time()
         solved = sudoku_solver.search(translated, self.units)
-
+        end_time = time.time()
+        total_time = end_time - start_time
+        print(total_time)
+        
         self.assertTrue(sudoku_solver.solved_puzzle(self.units, solved))
 
 
