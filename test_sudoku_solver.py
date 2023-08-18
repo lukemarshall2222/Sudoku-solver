@@ -16,6 +16,8 @@ class test_solver(unittest.TestCase):
         self.puzzle_w_zeros = "400000805030000000000700000020000060000080400000010000000603070500200000104000000"
         self.null_puzzle = "000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         self.solved_puzzle = "483921657967345821251876493548132976729564138136798245372689514814253769695417382"
+        self.solvable_by_cp = '003020600900305001001806400008102900700000008006708200002609500800203009005010300'
+
         
         self.units = sudoku_solver.create_units()
 
@@ -80,27 +82,34 @@ class test_solver(unittest.TestCase):
         translated_3 = sudoku_solver.translate_puzzle(self.puzzle)
         self.assertFalse(sudoku_solver.solved_puzzle(self.units, translated_3))
     
-    def test_constraint_propogation(self):
-        solvable_by_cp = '003020600900305001001806400008102900700000008006708200002609500800203009005010300'
-        translated = sudoku_solver.translate_puzzle(solvable_by_cp)
+    def test_constraint_propagation(self):
+        translated = sudoku_solver.translate_puzzle(self.solvable_by_cp)
         check_dict = translated.copy()
         solved = translated.copy()
-        count = 0
         while True:
-            count += 1
-            # print(count)
-            sudoku_solver.constraint_propogation(solved, self.units)
+            solved = sudoku_solver.constraint_propagation(solved, self.units)
             if solved == check_dict:
-                # print(solved)
-                # print(check_dict)
                 break
             else:
-                # print("broken")
                 check_dict = solved.copy()
                 continue
+        self.assertTrue(sudoku_solver.valid_puzzle(self.units, solved))
+        self.assertTrue(sudoku_solver.solved_puzzle(self.units, solved))
     
+    def test_cp_loop(self):
+        translated = sudoku_solver.translate_puzzle(self.solvable_by_cp)
+        solved = sudoku_solver.cp_loop(translated, self.units)
+
+        self.assertTrue(sudoku_solver.valid_puzzle(self.units, solved))
         self.assertTrue(sudoku_solver.solved_puzzle(self.units, solved))
 
+    def test_search(self):
+        hard_puzzle = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+        translated = sudoku_solver.translate_puzzle(hard_puzzle)
+        solved = sudoku_solver.search(translated, self.units)
+
+        self.assertTrue(solved)
+        # self.assertTrue(sudoku_solver.solved_puzzle(self.units, translated))
 
 
 if __name__ == '__main__':

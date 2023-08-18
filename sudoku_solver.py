@@ -87,14 +87,16 @@ def create_units() -> list[list]:
     # Add all units into one large list 
     all_units = []
     
-    for i in range(9):
-        all_units.append(rows[i])
-        all_units.append(columns[i])
-    
     for i in range(3):
         all_units.append(grid_3x3s_1[i])
         all_units.append(grid_3x3s_2[i])
         all_units.append(grid_3x3s_3[i])
+
+    for i in range(9):
+        all_units.append(rows[i])
+    
+    for i in range(9):
+        all_units.append(columns[i])
     
     return all_units
 
@@ -134,15 +136,16 @@ def solved_puzzle(units: list[list], values: dict) -> bool:
         return False
 
 
-def constraint_propogation(values: dict, units: list[list]) -> dict:
+def constraint_propagation(values: dict, units: list[list]) -> dict:
     # If a square has only one possible value,
     # then eliminate that value from the square's peers
+    values_cp = values.copy()
     for unit in units:
         for square in unit:
-            if len(values[square]) == 1:
+            if len(values_cp[square]) == 1:
                 for sq in unit:
-                    if len(values[sq]) > 1:
-                        values[sq] = values[sq].replace(values[square], '')
+                    if len(values_cp[sq]) > 1:
+                        values_cp[sq] = values_cp[sq].replace(values_cp[square], '')
                     else:
                         continue
             else:
@@ -151,9 +154,9 @@ def constraint_propogation(values: dict, units: list[list]) -> dict:
     # If a unit has only one possibe place for a value, 
     # then put that value there
     possible_values = {}
-    for unit in units:
-        for i in range(9):
-            possible_values[str(i+1)] = 0
+    for i in range(9):
+        possible_values[str(i+1)] = 0
+    reset_possible_values = possible_values.copy()
 
     for unit in units:
         for square in unit:
@@ -176,43 +179,78 @@ def constraint_propogation(values: dict, units: list[list]) -> dict:
                         continue
             else:
                 continue
+        possible_values = reset_possible_values.copy()
     
-    return values
+    return values_cp
 
 
-def search(values: dict, units: list[list]) -> dict:
+def cp_loop(values: dict, units: list[list]) -> dict:
+    solved = values.copy()
+    check_dict = values.copy()
+    while True:
+        solved = constraint_propagation(solved, units)
+        if solved == check_dict:
+            break
+        else:
+            check_dict = solved.copy()
+            continue
+    
+    return solved
 
-    # base case: 
-    if solved_puzzle(units, values):
-        return values
 
-    # recursive case:
-
-    # find the square with the least number of value options
+def search(values: dict, units: list[list]) -> bool:
+    propagated = cp_loop(values, units)
+    if solved_puzzle(units, propagated):
+        values = propagated.copy()
+        return True
+    if not valid_puzzle(units, propagated):
+        return False
     values_copy = values.copy()
     least_key = ''
-    values_len = 9
+    values_len = 10
     for key in values:
         if 1 < len(values[key]) < values_len:
             least_key = key
             values_len = len(values[key])
+    for value in values[least_key]:
+        values[least_key] = value
+        if search(values, units):
+            return True
+        else:
+            values = values_copy.copy()
+    return False
+
+
+    '''#Base Case:
+    if solved_puzzle(units, values):
+        return values
+    # find the order of the sqaures with the least number of value options
+    least_key_order = []
+    values_len = 2
+    for order in range(9):
+        for key in values:
+            if len(values[key]) == order+1:
+                least_key_order.append(key)
+        values_len += 1
 
     # use the square with the least number of options as a launch
-    # point to guess its value and execute more constraint propogation.
-    values_copy[least_key] = values_copy[least_key][0]
-    check_dict = values_copy.copy()
-    while True:
-        constraint_propogation(values_copy, units)
-        if values_copy == check_dict:
-            break
-        else:
-            values_copy = check_dict.copy()
-
-    if valid_puzzle(units, values_copy):
-        return search(values_copy, units)
-    else:
-        values[least_key] = values[least_key].replace(values[least_key][0], '')
-        return search(values, units)
+    # point to guess its value and execute more constraint propogation
+    values_copy = values.copy()  
+    new_values = {}
+    for key in least_key_order:
+        if len(values_copy[key]) == 1:
+            continue
+        for value in values_copy[key]:
+            values_copy[key] = values[key][0]
+            new_values = cp_loop(values_copy, units)
+            if valid_puzzle(units, new_values) and not solved_puzzle(units, new_values):
+                new_values = search(new_values, units)
+            elif not valid_puzzle(units, new_values):
+                new_values = search(values, units)
+            if solved_puzzle(units, new_values):
+                return new_values
+    
+    return values'''
     
 
 def main():
