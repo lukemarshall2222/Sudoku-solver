@@ -200,11 +200,8 @@ def cp_loop(values: dict, units: list[list]) -> dict:
 
 def search(values: dict, units: list[list]) -> bool:
     propagated = cp_loop(values, units)
-    if solved_puzzle(units, propagated):
-        values = propagated.copy()
-        return True
-    if not valid_puzzle(units, propagated):
-        return False
+    if solved_puzzle(units, propagated) or not valid_puzzle(units, propagated):
+        return propagated
     values_copy = values.copy()
     least_key = ''
     values_len = 10
@@ -214,11 +211,12 @@ def search(values: dict, units: list[list]) -> bool:
             values_len = len(values[key])
     for value in values[least_key]:
         values[least_key] = value
-        if search(values, units):
-            return True
+        solved = search(values, units)
+        if solved_puzzle(units, solved):
+            return solved
         else:
             values = values_copy.copy()
-    return False
+    return values
 
 
     '''#Base Case:

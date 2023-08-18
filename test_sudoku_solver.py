@@ -108,8 +108,7 @@ class test_solver(unittest.TestCase):
         translated = sudoku_solver.translate_puzzle(hard_puzzle)
         solved = sudoku_solver.search(translated, self.units)
 
-        self.assertTrue(solved)
-        # self.assertTrue(sudoku_solver.solved_puzzle(self.units, translated))
+        self.assertTrue(sudoku_solver.solved_puzzle(self.units, solved))
 
 
 if __name__ == '__main__':
