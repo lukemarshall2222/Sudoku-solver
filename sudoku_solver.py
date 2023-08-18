@@ -5,6 +5,8 @@ Description: Sudoku solver in Python using constraint propogation and search.
 
 
 def translate_puzzle(puzzle: str) -> dict:
+    # check the puzzle is not within quotes
+    assert puzzle[0] != "'" and puzzle[0] != '"', "Entered puzzle must not be enclosed in quotes or any other character."
     # check puzzle has necessary rows and columns
     assert len(puzzle) == 81, "Puzzles must contain 9 rows of values, 81 values in the string."
     puzzle = puzzle.replace('.', '0')
@@ -217,19 +219,42 @@ def search(values: dict, units: list[list]) -> bool:
         else:
             values = values_copy.copy()
     return values
-    
+
+
+def transcribe(solved: dict) -> str:
+    return ('').join(solved.values())    
+
 
 def main():
     puzzle = input("""Please enter a Sudoku puzzle.
                    The puzzle must be in the form of a string of 81 values.
                    The given values must be placed in their original spots
                    with empty squares represented by zero ('0') or ('.').
-                   Ex: '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'"""
+                   Ex: 4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......
+                   Ex: 400000805030000000000700000020000060000080400000010000000603070500200000104000000
+                   Do not place quotes or any other characters around the entered string.
+                   If the puzzle does not have one unique solution (e.g. at least 17 squares with given values
+                   or at least 8 different given values at the start), it will be considered unsolvable.
+                   Please enter your puzzle here: """
 )
     values = translate_puzzle(puzzle)
-    units = create_units(puzzle)
+    units = create_units()
 
-    assert valid_puzzle(units, values), "This puzzle is not valid"
+    # check that the puzzle is valid before beginning
+    assert valid_puzzle(units, values), "This puzzle is not valid, detected at the start."
 
-    return search(values, units)
+    solved = search(values, units)
     
+    # check that the puzzle is valid and solvable before returning it
+    assert valid_puzzle(units, solved), "This puzzle is not valid, detected while solving."
+    assert solved_puzzle(units, solved), "This puzzle is not solvable."
+
+    # turn the values dict back into a string 
+    solved_transcription = transcribe(solved)
+    print(f"The solved puzzle is: {solved_transcription}")
+
+    return solved_transcription
+
+
+if __name__ == '__main__':
+    main()
