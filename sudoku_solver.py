@@ -28,31 +28,12 @@ def translate_puzzle(puzzle: str) -> dict:
     return values
 
 
-def create_3x3s_from_3x9(grid_3x9: list[list], start: int) -> list[list]:
-    # Creates 3x3 matrices out of the 3x9 matrix. Takes a starting integer in
-    # order to differentiate the outputs from the 3 3x9 matrices made from the
-    # original puzzle board
-    rows = 'ABCDEFGHI'
-    grid_3x3s = [[], [], []]
-    for i in range(start, start+3):
-        for j in range(9):
-            if j < 3:
-                grid_3x3s[0].append(('').join([rows[i], str(j+1)]))
-            elif 3 <= j < 6:
-                grid_3x3s[1].append(('').join([rows[i], str(j+1)]))
-            else:
-                grid_3x3s[2].append(('').join([rows[i], str(j+1)]))
-    return grid_3x3s
-
-
 def create_units() -> list[list]:
     row_order = 'ABCDEFGHI'
     # create the row units
     rows = []
     for i in range(9):
-        rows.append([])
-        for j in range(9):
-            rows[i].append(('').join([row_order[i], str(j+1)]))
+        rows.append([ ('').join([row_order[i], str(j+1)]) for j in range(9)])
 
     # create the column units
     columns = []
@@ -63,43 +44,29 @@ def create_units() -> list[list]:
             columns[k].append(('').join([row_order[j], str(k+1)]))
 
     # create box units
+    row_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
     boxes = []
-    for i in range(9):
-        boxes.append([])
-
-    grid_3x9_1 = [[], [], []]
-    for j in range(3):
-        for k in range(9):
-            grid_3x9_1[j].append(('').join([row_order[j], str(k+1)]))
-
-    grid_3x9_2 = [[], [], []]
-    for j in range(3):
-        for k in range(9):
-            grid_3x9_2[j].append(('').join([row_order[j+3], str(k+1)]))
-
-    grid_3x9_3 = [[], [], []]
-    for j in range(3):
-        for k in range(9):
-            grid_3x9_2[j].append(('').join([row_order[j+6], str(k+1)]))
-    
-    grid_3x3s_1 = create_3x3s_from_3x9(grid_3x9_1, 0)
-    grid_3x3s_2 = create_3x3s_from_3x9(grid_3x9_2, 3)
-    grid_3x3s_3 = create_3x3s_from_3x9(grid_3x9_3, 6)
+    for iteration in range(3):
+        squares = [[], [], []]
+        for row_i in range(3):
+            for col_i in range(9):
+                if col_i < 3:
+                    squares[0].append(('').join([row_letters[row_i], str(col_i+1)]))
+                elif 2 < col_i < 6:
+                    squares[1].append(('').join([row_letters[row_i], str(col_i+1)]))
+                else:
+                    squares[2].append(('').join([row_letters[row_i], str(col_i+1)]))
+        for box in squares:
+            boxes.append(box)
+        del row_letters[:3]
 
     # Add all units into one large list 
     all_units = []
-    
-    for i in range(3):
-        all_units.append(grid_3x3s_1[i])
-        all_units.append(grid_3x3s_2[i])
-        all_units.append(grid_3x3s_3[i])
-
     for i in range(9):
         all_units.append(rows[i])
-    
-    for i in range(9):
         all_units.append(columns[i])
-    
+        all_units.append(boxes[i])
+        
     return all_units
 
 

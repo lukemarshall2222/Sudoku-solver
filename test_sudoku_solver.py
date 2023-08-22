@@ -104,13 +104,9 @@ class test_solver(unittest.TestCase):
         self.assertTrue(sudoku_solver.solved_puzzle(self.units, solved))
 
     def test_search(self):
-        hard_puzzle = "48.3............71.2.......7.5....6....2..8.............1.76...3.....4......5...."
+        hard_puzzle = "6.....8.3.4.7.................5.4.7.3..2.....1.6.......2.....5.....8.6......1...."
         translated = sudoku_solver.translate_puzzle(hard_puzzle)
-        start_time = time.time()
         solved = sudoku_solver.search(translated, self.units)
-        end_time = time.time()
-        total_time = end_time - start_time
-        print(total_time)
         
         self.assertTrue(sudoku_solver.solved_puzzle(self.units, solved))
 
