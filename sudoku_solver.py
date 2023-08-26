@@ -31,18 +31,13 @@ def translate_puzzle(puzzle: str) -> dict:
 def create_units() -> list[list]:
     row_order = 'ABCDEFGHI'
     # create the row units
-    rows = []
-    for i in range(9):
-        rows.append([ ('').join([row_order[i], str(j+1)]) for j in range(9)])
+    rows = [[ ('').join([row_order[i], str(j+1)]) 
+             for j in range(9)] for i in range(9) ]
 
     # create the column units
-    columns = []
-    for i in range(9):
-        columns.append([])
-    for j in range(9):
-        for k in range(9):
-            columns[k].append(('').join([row_order[j], str(k+1)]))
-
+    columns = [[ ('').join([row_order[j], str(i+1)]) 
+                for j in range(9)] for i in range(9) ]
+    
     # create box units
     row_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
     boxes = []
@@ -115,10 +110,6 @@ def constraint_propagation(values: dict, units: list[list]) -> dict:
                 for sq in unit:
                     if len(values_cp[sq]) > 1:
                         values_cp[sq] = values_cp[sq].replace(values_cp[square], '')
-                    else:
-                        continue
-            else:
-                continue
 
     # If a unit has only one possibe place for a value, 
     # then put that value there
@@ -132,8 +123,6 @@ def constraint_propagation(values: dict, units: list[list]) -> dict:
             if len(values[square]) > 1:
                 for char in values[square]:
                     possible_values[char] += 1
-            else:
-                continue
         for key in possible_values:
             if possible_values[key] == 1:
                 for sq in unit:
@@ -142,12 +131,6 @@ def constraint_propagation(values: dict, units: list[list]) -> dict:
                             if character == key:
                                 values[sq] = key
                                 break
-                            else:
-                                continue
-                    else:
-                        continue
-            else:
-                continue
         possible_values = reset_possible_values.copy()
     
     return values_cp
@@ -202,8 +185,8 @@ def main():
                    Do not place quotes or any other characters around the entered string.
                    If the puzzle does not have one unique solution (e.g. at least 17 squares with given values
                    or at least 8 different given values at the start), it will be considered unsolvable.
-                   Please enter your puzzle here: """
-)
+                   Please enter your puzzle here: """)
+
     values = translate_puzzle(puzzle)
     units = create_units()
 
