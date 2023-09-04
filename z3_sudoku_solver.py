@@ -6,7 +6,7 @@ Description: Sudoku solver in Z3Py.
 from z3 import *
 
 
-def translate_puzzle(puzzle: str) -> dict:
+def translate_puzzle(puzzle: str) -> list[list]:
     # check the puzzle is not within quotes
     assert puzzle[0] != "'" and puzzle[0] != '"', "Entered puzzle must not be enclosed in quotes or any other character."
     # check puzzle has necessary rows and columns
@@ -82,11 +82,11 @@ def main():
     
     # create and add the constraints that any square is unique to those 
     # in its row, column, and box units
-    rows_constraint = [ Distinct(rows[i]) for i in range(9)]
+    rows_constraint = [ Distinct(rows[i]) for i in range(9) ]
     s.add(rows_constraint)
-    cols_constraint = [ Distinct(columns[i]) for i in range(9)]
+    cols_constraint = [ Distinct(columns[i]) for i in range(9) ]
     s.add(cols_constraint)
-    boxes_constraint = [ Distinct(boxes[i]) for i in range(9)]
+    boxes_constraint = [ Distinct(boxes[i]) for i in range(9) ]
     s.add(boxes_constraint)
 
     # create the board of values out of the original puzzle
